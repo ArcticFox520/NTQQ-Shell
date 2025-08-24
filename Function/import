@@ -1,0 +1,5 @@
+#!/bin/env bash
+function import(){
+ImportPath=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+source ${ImportPath}/$1
+}

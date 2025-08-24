@@ -1,0 +1,12 @@
+#!/bin/env bash
+import returnError
+function setTUISoftware(){
+if [ -x "$(command -v whiptail)" ];then
+  echo whiptail
+elif [ -x "$(command -v dialog)" ];then
+  echo dialog
+else
+  log.error "无TUI软件"
+  returnError
+fi
+}

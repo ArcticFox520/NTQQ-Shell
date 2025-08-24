@@ -1,0 +1,38 @@
+#!/bin/env bash
+Path=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+source ${Path}/../Function/import
+
+import setMenuSize
+import setMsgboxSize
+import setTUISoftware
+
+QQ_RS="/opt/QQ/resources/app"
+QQ_PJ="${QQ_RS}/package.json"
+QQ_NC="${QQ_RS}/NapCat"
+
+# CP: Config Path
+CP="./config.json"
+# TM: Terminal Multiplexer
+TM="$(jq -r .TerminalMultiplexer ${Path}/${CP})"
+# TT: Title Text
+TT="$(jq -r .TitleText ${Path}/${CP})"
+# SN: Session Name
+SN="$(jq -r .SessionName ${Path}/${CP})"
+# SC: Start Command
+SC="$(jq -r .StartCommand ${Path}/${CP})"
+# SM: Start Mode
+
+if [ -e ${QQ_PJ} ] && [ -e ${QQ_NC}/package ]
+then
+  exit 0
+else
+  if $(setTUISoftware) --title "$TT"  \
+  --yesno "$TT [未安装]" \
+  --yes-button "立刻安装" --no-button "返回菜单" \
+  $(setMsgboxSize)
+  then
+    bash ${Path}/Install
+  else
+    exit 1
+  fi
+fi

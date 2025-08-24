@@ -1,0 +1,27 @@
+#!/bin/env bash
+Path=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+source ${Path}/../../Function/import
+import manageSession
+
+# CP: Config Path
+CP="${CP}"
+# TM: Terminal Multiplexer
+TM="$(jq -r .TerminalMultiplexer ${Path}/${CP})"
+# TT: Title Text
+TT="$(jq -r .TitleText ${Path}/${CP})"
+# SN: Session Name
+SN="$(jq -r .SessionName ${Path}/${CP})"
+# SC: Start Command
+SC="$(jq -r .StartCommand ${Path}/${CP})"
+
+function getAppMode(){
+  if manageSession "$TM" list "$SN"
+  then
+    return 1
+  elif ps all | sed '/grep/d' | sed '/dialog/d' | sed '/whiptail/d' | grep -q "$SC"
+  then
+    return 2
+  else
+    return 0
+  fi
+}

@@ -1,0 +1,71 @@
+#!/bin/env bash
+import setColour
+import log
+function selectLocation(){
+if [ -n "${LOCATION}" ]; then
+    return 0
+fi
+echo
+echo -e "———————————————————"
+echo -e " ${cyan}请问您的设备所在位置是? ${background}"
+echo -e " ${green}1${white}. 中国大陆 ${background}"
+echo -e " ${green}2${white}. 其他位置 ${background}"
+echo -e "———————————————————"
+echo -en " ${cyan}请输入数字 ${white}[1-2]: ${background}"
+echo -en " "${cyan}请输入数字 ${white}[1-2]: ${background}
+read num
+case "${num}" in
+  1)
+    export LOCATION=CN
+    return 0
+    ;;
+  2)
+    return 1
+    ;;
+  *)
+    log.warn "输入错误 保持默认 中国大陆"
+    return 0
+    ;;
+esac
+}
+function getLocation(){
+if [ -x "$(command -v jq)" ]
+then
+  ApiList=(
+    "ipinfo.io/json .country"
+    "ipapi.co/json .country"
+    "ip-api.com/json .countryCode"
+  )
+  for i in ${ApiList[@]}
+  do
+    local Api=$(echo ${i} | awk '{print $1}')
+    local field=$(echo ${i} | awk '{print $2}')
+    local result=$(curl -sL --connect-timeout 5 --max-time 10 ${Api})
+    if echo "${result}" | jq -r ${field} | grep -q "CN";then
+      return 0
+    else
+      return 1
+    fi
+  done
+else
+  if [ -x "$(command -v curl)" ]
+  then
+    ApiList=(
+      "ipinfo.io/country"
+      "ipapi.co/country"
+    )
+    for i in ${ApiList[@]}
+    do
+      local result=$(curl -sL --connect-timeout 5 --max-time 10 ${i})
+      if echo "${result}" | grep -q "CN";then
+        return 0
+      else
+        return 1
+      fi
+    done
+  else
+    selectLocation
+    return $?
+  fi
+fi
+}

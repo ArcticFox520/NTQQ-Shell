@@ -1,0 +1,21 @@
+#!/bin/env bash
+import log
+import returnError
+function getArchitecture(){
+  local machine=$(uname -m)
+  case $machine in
+    x86_64|x64)
+      echo amd64
+      ;;
+    aarch64|arm64)
+      echo arm64
+      ;;
+    *)
+      log.error "不支持的架构"
+      log.warn "您的CPU为 $(uname -m)"
+      log.warn "请截图以便于开发者适配"
+      returnError
+      ;;
+  esac
+}
+

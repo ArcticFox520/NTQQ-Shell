@@ -1,0 +1,42 @@
+#!/bin/env bash
+import incrCounter
+import log
+function getFile(){
+file="$1"
+URL="$2"
+Download(){
+  log.info "正在下载 ${file}"
+  until ${Command}
+  do
+    if ! IncrCounter
+    then
+      log.error "错误次数过多"
+      return 1
+    fi
+    log.warn "下载失败 三秒后重试"
+    sleep 3s
+  done
+  log.success "下载完成"
+  return 0
+}
+if $(type wget > /dev/null 2>&1) && $(wget --help 2>&1 | grep -q show-progress)
+then
+  Command="wget --quiet --show-progress --output-document="${file}" --continue "${URL}""
+  Download
+elif $(type curl > /dev/null 2>&1) && $(curl --help all 2>&1 | grep -q progress-bar)
+then
+  Command="curl --output "${file}" --progress-bar --location --continue-at - "${URL}""
+  Download
+elif $(type curl > /dev/null 2>&1)
+then
+  Command="curl --output "${file}" --continue-at - "${URL}""
+  Download
+elif $(type wget > /dev/null 2>&1)
+then
+  Command="wget --output-document="${file}" --continue "${URL}""
+  Download
+else
+  log.error "无下载器"
+  return 1
+fi
+}

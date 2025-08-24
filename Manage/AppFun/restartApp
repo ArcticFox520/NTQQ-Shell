@@ -1,0 +1,70 @@
+#!/bin/env bash
+Path=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+source ${Path}/../../Function/import
+source ${Path}/getAppMode
+
+import log
+import setColour
+import setMsgboxSize
+import setTUISoftware
+import manageSession
+
+# CP: Config Path
+CP="${CP}"
+# TM: Terminal Multiplexer
+TM="$(jq -r .TerminalMultiplexer ${Path}/${CP})"
+# TT: Title Text
+TT="$(jq -r .TitleText ${Path}/${CP})"
+# SN: Session Name
+SN="$(jq -r .SessionName ${Path}/${CP})"
+# SC: Start Command
+SC="$(jq -r .StartCommand ${Path}/${CP})"
+
+getAppMode "$SN" "$SC"
+local result=$?
+case ${result} in
+  1)
+    log.info "正在停止 $SN"
+    if ! manageSession "$TM" stop "$SN"
+    then
+      echo -en ${blue}[${red}*${blue}] ${cyan}停止失败 回车返回${background};read
+      return 1
+    fi
+    ;;
+  2)
+    log.info "正在停止 $SN"
+    PID=$(ps all | sed '/grep/d' | sed '/dialog/d' | sed '/whiptail/d' | grep "$SC" | awk '{print $3}')
+    if ! kill $PID
+    then
+      echo -en ${blue}[${red}*${blue}] ${cyan}停止失败 回车返回${background};read
+      return 1
+    fi
+    ;;
+  0)
+    $(setTUISoftware) --title "$TT"  \
+    --msgbox "$SN 目前处于 [未启动]" \
+    $(setMsgboxSize)
+    return 0
+    ;;
+esac
+case ${result} in
+1)
+  if manageSession "$TM" start "$SN" "$SC"
+  then
+    if $(setTUISoftware) --title "$TT"  \
+    --yesno "$TT [重启成功]" \
+    --yes-button "打开日志" --no-button "返回菜单" \
+    $(setMsgboxSize)
+    then
+      manageSession "$TM" log "$SN"
+    else
+      return 0
+    fi
+  fi
+  ;;
+2)
+  log.info"正在启动 $SN"
+  "$SC"
+  echo -en ${blue}[${green}*${blue}] ${cyan}回车返回${background};read
+  ;;
+esac

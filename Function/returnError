@@ -1,0 +1,9 @@
+#!/bin/env bash
+import setColour
+import log
+function returnError(){
+while read
+do
+  log.warn "请截图以便于开发者检查"
+done
+}

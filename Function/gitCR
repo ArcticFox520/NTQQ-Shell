@@ -1,0 +1,78 @@
+#!/bin/env bash
+import getLocation
+import getFile
+# 末尾必须带 /
+export GHP="https://gh.arcticfox.top/"
+function gitCR(){
+gitClone(){
+if getLocation
+then
+  if git clone --depth=1 --branch=$1 ${GHP}https://github.com/$2
+  then
+    return 0
+  else
+    return 1
+  fi
+else
+  if git clone --depth=1 --branch=$1 https://github.com/$2
+  then
+    return 0
+  else
+    return 1
+  fi
+fi
+}
+gitRelease(){
+if getLocation
+then
+  if getFile $1 ${GHP}https://github.com/$2/releases/latest/download/$3
+  then
+    return 0
+  else
+    return 1
+  fi
+else
+  if getFile $1 https://github.com/$2/releases/latest/download/$3
+  then
+    return 0
+  else
+    return 1
+  fi
+fi
+}
+gitRaw(){
+if getLocation
+then
+  if getFile $1 ${GHP}https://github.com/$2/raw/refs/heads/$3/$4
+  then
+    return 0
+  else
+    return 1
+  fi
+else
+  if getFile $1 ${GHP}https://github.com/$2/raw/refs/heads/$3/$4
+  then
+    return 0
+  else
+    return 1
+  fi
+fi
+}
+case $1 in
+clone)
+  # $2: 分支名
+  # $3: 用户名/仓库名
+  gitClone $2 $3;;
+release)
+  # $2: 保存文件名
+  # $3: 用户名/仓库名
+  # $4: release文件名
+  gitRelease $2 $3 $4;;
+raw)
+  # $2: 保存文件名
+  # $3 用户名/仓库名
+  # $4 分支名
+  # $5 文件路径
+  gitRaw $2 $3 $4 $5;;
+esac
+}

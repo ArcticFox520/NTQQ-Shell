@@ -1,0 +1,68 @@
+#!/bin/env bash
+Path=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+source ${Path}/../../Function/import
+source ${Path}/getAppMode
+
+import log
+import setColour
+import setMsgboxSize
+import setTUISoftware
+import manageSession
+
+# CP: Config Path
+CP="${CP}"
+# TM: Terminal Multiplexer
+TM="$(jq -r .TerminalMultiplexer ${Path}/${CP})"
+# TT: Title Text
+TT="$(jq -r .TitleText ${Path}/${CP})"
+# SN: Session Name
+SN="$(jq -r .SessionName ${Path}/${CP})"
+# SC: Start Command
+SC="$(jq -r .StartCommand ${Path}/${CP})"
+# SM: Start Mode
+SM="$1"
+
+function startBackground(){
+  if manageSession "$TM" start "$SN" "$SC"
+  then
+    if $(setTUISoftware) --title "$TT"  \
+    --yesno "$TT [启动成功]" \
+    --yes-button "打开日志" --no-button "返回菜单" \
+    $(setMsgboxSize)
+    then
+      manageSession "$TM" log "$SN"
+    else
+      return 0
+    fi
+  fi
+}
+function startForeground(){
+  log.info "正在启动 $SN"
+  "$SC"
+  echo -en ${blue}[${green}*${blue}] ${cyan}回车返回${background};read
+}
+if getAppMode "$SN" "$SC"
+then
+  case ${SM} in
+  SBG)
+      startBackground
+    ;;
+  SFG)
+      startForeground
+    ;;
+  esac
+else
+  getAppMode "$SN" "$SC"
+  case $? in
+    1)
+      $(setTUISoftware) --title "$TT"  \
+      --msgbox "$SN 目前处于 [$TM]" \
+      $(setMsgboxSize)
+      ;;
+    2)
+      $(setTUISoftware) --title "$TT"  \
+      --msgbox "$SN 目前处于 [前台]" \
+      $(setMsgboxSize)
+      ;;
+  esac
+fi

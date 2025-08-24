@@ -1,0 +1,6 @@
+{
+  "TerminalMultiplexer": "tmux",
+  "TitleText": "NapCat-Shell",
+  "SessionName": "NapCat",
+  "StartCommand": "xvfb-run -a qq --no-sandbox"
+}

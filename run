@@ -1,0 +1,22 @@
+#!/bin/env bash
+Path=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+source ${Path}/Function/import
+source ${Path}/Function/returnError
+SHELL_HOME=NTQQ_SHELL_HOME
+
+InstallList=(
+  "package"
+)
+
+for i in ${InstallList[@]}
+do
+  if ! bash ${Path}/Install/${i}
+  then
+    returnError
+    exit
+  fi
+done
+cp -f ${Path}/start /usr/local/bin/afnq
+sed -i "s|${SHELL_HOME}|${Path}|g" /usr/local/bin/afnq
+chmod +x /usr/local/bin/afnq
+afnq

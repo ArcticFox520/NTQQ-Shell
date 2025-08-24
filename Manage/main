@@ -1,0 +1,106 @@
+#!/bin/env bash
+Path=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+source ${Path}/../Function/import
+
+import setMenuSize
+import setMsgboxSize
+import setTUISoftware
+TT="NTQQ-Shell"
+
+function MainMenu(){
+Number=$($(setTUISoftware) \
+--title "$TT" \
+--menu "请选择操作: " \
+$(setMenuSize) \
+"1" "NapCat" \
+"0" "退出菜单" \
+3>&1 1>&2 2>&3)
+result=$?
+case ${Number} in
+1)
+  NTQQ_TYPE="NapCat"
+  ;;
+esac
+if ! bash ${Path}/../NapCat/CheckNapCat
+then
+  return
+fi
+SecondaryMenu
+}
+
+function SecondaryMenu(){
+# CP: Config Path
+export CP="../${NTQQ_TYPE}/config.json"
+# TM: Terminal Multiplexer
+TM="$(jq -r .TerminalMultiplexer ${Path}/${CP})"
+# TT: Title Text
+TT="$(jq -r .TitleText ${Path}/${CP})"
+# SN: Session Name
+SN="$(jq -r .SessionName ${Path}/${CP})"
+# SC: Start Command
+SC="$(jq -r .StartCommand ${Path}/${CP})"
+
+Number=$($(setTUISoftware) \
+--title "$TT" \
+--menu "请选择操作: " \
+$(setMenuSize) \
+"1" "启动运行" \
+"2" "前台启动" \
+"3" "停止运行" \
+"4" "重新启动" \
+"5" "打开日志" \
+"6" "全部更新" \
+"7" "其他功能" \
+"8" "进入bash" \
+"0" "返回主页" \
+3>&1 1>&2 2>&3)
+result=$?
+case ${Number} in
+1)
+    bash ${Path}/AppFun/startApp SBG
+  ;;
+2)
+    bash ${Path}/AppFun/startApp SFG
+  ;;
+3)
+    bash ${Path}/AppFun/stopApp
+  ;;
+4)
+    bash ${Path}/AppFun/restartApp
+  ;;
+5)
+    bash ${Path}/AppFun/logApp
+  ;;
+6)
+    bash ${Path}/updateAll
+  ;;
+7)
+    $(setTUISoftware) --title "$TT"  \
+    --msgbox "未完工" \
+    $(setMsgboxSize)
+    #source ${Path}/otherFunction
+  ;;
+8)
+    exec bash
+  ;;
+0)
+    return 0
+  ;;
+esac
+while true
+do
+  SecondaryMenu
+  case ${result} in
+  1)
+    exit
+  esac
+done
+}
+while true
+do
+  MainMenu
+  case ${result} in
+  1)
+    exit
+  esac
+done

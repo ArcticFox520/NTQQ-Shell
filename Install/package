@@ -1,0 +1,22 @@
+#!/bin/env bash
+Path=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+source ${Path}/../Function/import
+
+import log
+
+Package=("tar" "gzip" "xz-utils" "unzip" "tmux" "wget" "curl" "pv" "git" "jq" "xvfb")
+log.info "正在更新 软件源列表"
+apt -y update
+for PKG in ${Package[@]}
+do
+  if ! dpkg -s ${PKG} > /dev/null 2>&1
+  then
+    log.info "正在安装 ${PKG}"
+    until apt install -y ${PKG}
+    do
+      log.warn "安装失败 3秒后重试"
+      sleep 3s
+    done
+    log.success "安装成功"
+  fi
+done

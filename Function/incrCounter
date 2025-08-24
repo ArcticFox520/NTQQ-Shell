@@ -1,0 +1,14 @@
+#!/bin/env bash
+function IncrCounter(){
+  if [ -z ${count} ]
+  then
+    count=0
+  fi
+  ((count++))
+  case ${count} in
+    3)
+      count=0
+      return 1
+  esac
+  return 0
+}

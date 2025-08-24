@@ -1,0 +1,36 @@
+#!/bin/env bash
+Path=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+source ${Path}/../../Function/import
+source ${Path}/getAppMode
+
+import setMsgboxSize
+import setTUISoftware
+import manageSession
+
+# CP: Config Path
+CP="${CP}"
+# TM: Terminal Multiplexer
+TM="$(jq -r .TerminalMultiplexer ${Path}/${CP})"
+# TT: Title Text
+TT="$(jq -r .TitleText ${Path}/${CP})"
+# SN: Session Name
+SN="$(jq -r .SessionName ${Path}/${CP})"
+# SC: Start Command
+SC="$(jq -r .StartCommand ${Path}/${CP})"
+
+getAppMode "$SN" "$SC"
+case $? in
+  1)
+    manageSession "$TM" log "$SN"
+    ;;
+  2)
+    $(setTUISoftware) --title "$TT"  \
+    --msgbox "$SN 目前处于 [前台]" \
+    $(setMsgboxSize)
+    ;;
+  0)
+    $(setTUISoftware) --title "$TT"  \
+    --msgbox "$SN 目前处于 [未启动]" \
+    $(setMsgboxSize)
+    ;;
+esac
