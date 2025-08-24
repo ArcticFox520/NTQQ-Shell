@@ -24,7 +24,7 @@ else
 fi
 
 log.info "正在安装 依赖包"
-apt install -y -f libgbm1 libnss3
+apt install -y -f libgbm1 libnss3 xvfb
 apt install -y -f libasound2t64 || apt install -y -f libasound2
 log.info "安装完成"
 
