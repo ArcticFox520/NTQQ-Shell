@@ -4,7 +4,7 @@ source ${Path}/../Function/import
 
 import log
 
-Package=("tar" "gzip" "xz-utils" "unzip" "tmux" "wget" "curl" "pv" "git" "jq" "xvfb")
+Package=("tar" "gzip" "xz-utils" "unzip" "tmux" "wget" "curl" "pv" "git" "jq")
 log.info "正在更新 软件源列表"
 apt -y update
 for PKG in ${Package[@]}
@@ -20,3 +20,10 @@ do
     log.success "安装成功"
   fi
 done
+
+if [ ! -x "$(command -v whiptail)" ] && [ ! -x "$(command -v dialog)" ]
+then
+  log.info "正在安装 dialog"
+  apt install -y dialog
+  log.success "安装成功"
+fi

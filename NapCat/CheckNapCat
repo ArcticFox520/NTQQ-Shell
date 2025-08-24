@@ -22,12 +22,12 @@ SN="$(jq -r .SessionName ${Path}/${CP})"
 SC="$(jq -r .StartCommand ${Path}/${CP})"
 # SM: Start Mode
 
-if [ -e ${QQ_PJ} ] && [ -e ${QQ_NC}/package ]
+if [ -e ${QQ_PJ} ] && [ -e ${QQ_NC}/package.json ]
 then
   exit 0
 else
   if $(setTUISoftware) --title "$TT"  \
-  --yesno "$TT [未安装]" \
+  --yesno "$SN [未安装]" \
   --yes-button "立刻安装" --no-button "返回菜单" \
   $(setMsgboxSize)
   then

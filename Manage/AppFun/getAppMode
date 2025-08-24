@@ -4,7 +4,7 @@ source ${Path}/../../Function/import
 import manageSession
 
 # CP: Config Path
-CP="${CP}"
+CP="../${CP}"
 # TM: Terminal Multiplexer
 TM="$(jq -r .TerminalMultiplexer ${Path}/${CP})"
 # TT: Title Text

@@ -11,7 +11,7 @@ import getArchitecture
 QQ_DL="https://dldir1.qq.com/qqfile/qq/QQNT/a7f1c5a0/linuxqq_3.2.17-34606_$(getArchitecture).deb"
 QQ_RS="/opt/QQ/resources/app"
 QQ_PJ="${QQ_RS}/package.json"
-QQ_NC="${QQ_RS}/NapCatQQ"
+QQ_NC="${QQ_RS}/NapCat"
 getFile QQ.deb ${QQ_DL}
 log.info "正在安装 QQ"
 if apt install -y -f ./QQ.deb
@@ -28,18 +28,26 @@ apt install -y -f libgbm1 libnss3
 apt install -y -f libasound2t64 || apt install -y -f libasound2
 log.info "安装完成"
 
+if [ ! -x "$(command -v whiptail)" ] && [ ! -x "$(command -v dialog)" ]
+then
+  log.info "正在安装 dialog"
+  apt install -y dialog
+  log.success "安装成功"
+fi
+
 if [ ! -d ${QQ_NC} ]
 then
   mkdir -p ${QQ_NC}
 fi
-if ! gitCR NapCat.Shell.zip NapNeko/NapCatQQ NapCat.Shell.zip
+
+if ! gitCR release NapCat.Shell.zip NapNeko/NapCatQQ NapCat.Shell.zip
 then
   exit 1
 fi
 
 size=$(unzip -l NapCat.Shell.zip | wc -l)
 size=$(expr ${size} - 4)
-if unzip NapCat.Shell.zip -d ${QQ_NC}| pv -l -s ${size} > /dev/null
+if unzip NapCat.Shell.zip -d ${QQ_NC} | pv -l -s ${size} > /dev/null
 then
   rm -rvf NapCat.Shell.zip
 else
@@ -68,5 +76,3 @@ mv loadNapCat.cjs ${QQ_RS}/loadNapCat.cjs
 MainContentOld="$(jq .main ${QQ_PJ})"
 MainContentNew="./loadNapCat.cjs"
 sed -i "s|${MainContentOld}|\"${MainContentNew}\"|g" ${QQ_PJ}
-
-
