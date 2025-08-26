@@ -28,7 +28,7 @@ function startBackground(){
 }
 function startForeground(){
   log.info "正在启动 $SN"
-  "$SC"
+  $SC
   echo -en ${blue}[${green}*${blue}] ${cyan}回车返回${background};read
 }
 if getAppMode "$SN" "$SC"
